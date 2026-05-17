@@ -3,96 +3,70 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rosay | Post Template</title>
+  <title>Roselyn Chen | Article</title>
   <meta
     name="description"
-    content="Single article template for future writing under the archive section."
+    content="A publication-style article layout generated from markdown."
   >
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
     rel="stylesheet"
   >
   <link rel="stylesheet" href="../../styles.css">
 </head>
 <body>
-  <div class="page">
-    <header class="site-header">
-      <a class="brand" href="../../">ROSAY</a>
-      <nav class="site-nav" aria-label="Primary">
+  <div class="page page-article-ref">
+    <header class="tm-header">
+      <div class="tm-header-left">
+        <a class="tm-wordmark" href="../../">Roselyn Chen</a>
+      </div>
+      <nav class="tm-top-nav" aria-label="Primary">
         <a href="../../">Home</a>
         <a href="../../about/">About</a>
         <a href="../" aria-current="page">Archive</a>
       </nav>
     </header>
 
-    <main class="layout article-layout">
-      <aside class="side-rail">
-        <section class="rail-block">
-          <p class="rail-label">Article</p>
-          <p class="rail-copy">Single post template for future long-form writing.</p>
-        </section>
-
-        <section class="rail-block">
-          <p class="rail-label">Type</p>
-          <p class="rail-copy">Essay / note / build log</p>
-        </section>
-
-        <section class="rail-block">
-          <p class="rail-label">Path</p>
-          <p class="rail-copy"><code>/archive/slug/</code></p>
-        </section>
+    <main class="tm-main">
+      <aside class="tm-toc" aria-label="On this page">
+        <a href="#introduction">Introduction</a>
+        <a href="#structure">Structure</a>
+        <a class="tm-toc-child" href="#reading-width">Reading width</a>
+        <a class="tm-toc-child" href="#metadata">Metadata</a>
+        <a href="#navigation">Navigation</a>
+        <a href="#future-workflow">Future workflow</a>
       </aside>
 
-      <article class="article-page">
-        <header class="article-header">
-          <p class="eyebrow">Post template</p>
-          <h1>What I want from a personal website that also functions like a research notebook.</h1>
-          <div class="article-meta">
-            <span>May 2026</span>
-            <span>Essay</span>
-            <span>8 min read</span>
+      <article class="tm-content">
+        <header class="tm-hero tm-hero-centered">
+          <p class="tm-kicker">Archive</p>
+          <h1 class="tm-title-highlight">Designing a Personal Research Archive for Writing, Projects, and Technical Notes</h1>
+          <div class="tm-publish-metadata">
+            <span>Roselyn Chen</span>
+            <span>May 17, 2026</span>
           </div>
-          <p class="article-dek">
-            This is a reusable single-post layout for future writing. Replace the title, metadata, summary, and body content with actual article material later.
-          </p>
         </header>
 
-        <div class="article-body">
-          <p>
-            The purpose of this template is to establish page rhythm rather than final content. A single article page should read more like a considered publication than a generic blog post screen.
-          </p>
-
-          <p>
-            That means the layout favors a narrow text column, consistent spacing, quiet metadata, and clear hierarchy between title, introduction, section headings, and body paragraphs.
-          </p>
-
-          <h2>Why keep a dedicated article template</h2>
-          <p>
-            Separating the archive list from the article page makes it easier to maintain a strong reading experience. The archive can scan quickly, while the article page can slow down and give the text room to breathe.
-          </p>
-
-          <p>
-            It also keeps future migration options open. If the site later adopts a generator such as Hexo, this page can still act as the visual reference for the post layout.
-          </p>
-
-          <h2>What to replace later</h2>
-          <ul class="article-list">
-            <li>Post title</li>
-            <li>Date, category, and reading time</li>
-            <li>Summary paragraph</li>
-            <li>Body text, headings, images, and references</li>
-          </ul>
-
-          <p>
-            For now, this page exists only as a structural scaffold. It completes the route flow from homepage to archive to article without forcing you to write real content before you are ready.
-          </p>
-        </div>
-
-        <footer class="article-footer">
-          <p><a href="../">Back to archive</a></p>
-        </footer>
+        <section class="tm-article-body">
+          <h2 id="introduction">Introduction</h2>
+          <p>A personal archive should do more than store writing. It should create a stable reading environment for essays, project retrospectives, and technical notes, while remaining simple enough to maintain over time.</p>
+          <p>The goal of this layout is to provide that environment: a narrow reading column, restrained typography, centered title treatment, and a left-hand table of contents that follows the article structure automatically.</p>
+          <h2 id="structure">Structure</h2>
+          <p>The archive page and the article page serve different purposes. The archive should remain concise and scannable, while the article page should slow the reader down and give the text enough room to unfold without distraction.</p>
+          <p>That separation makes the site easier to extend. As new writing is added, the archive can stay readable at a glance, and each post can preserve a consistent article rhythm.</p>
+          <h3 id="reading-width">Reading width</h3>
+          <p>A narrow body column improves continuity in long-form technical writing. It reduces visual drift, keeps paragraphs legible, and makes section transitions feel more deliberate.</p>
+          <h3 id="metadata">Metadata</h3>
+          <p>Author and date should be present, but quiet. They anchor the article without competing with the title or introducing the kind of noisy chrome more common in generic blog templates.</p>
+          <h2 id="navigation">Navigation</h2>
+          <p>A useful article page should expose structure without requiring manual maintenance. The left sidebar in this layout is generated directly from the headings in the article, so the navigation always matches the content.</p>
+          <p>This also makes the page a better fit for a future markdown workflow, where headings written in source content can be converted into both article structure and in-page navigation automatically.</p>
+          <h2 id="future-workflow">Future workflow</h2>
+          <p>If the site later adopts markdown as the primary writing format, the article content can still compile into this exact layout. A generator is helpful, but it is not necessary at this stage as long as the article structure remains predictable.</p>
+          <p>In practice, that means the writing flow can eventually become: write markdown, convert to HTML, inject it into this article shell, and regenerate the archive list from frontmatter metadata.</p>
+        </section>
       </article>
     </main>
   </div>

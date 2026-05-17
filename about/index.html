@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rosay | About</title>
+  <title>Roselyn Chen | About</title>
   <meta
     name="description"
-    content="About Rosay: profile, interests, and selected background."
+    content="About Roselyn Chen: education, projects, work experience, and skills."
   >
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
     rel="stylesheet"
   >
   <link rel="stylesheet" href="../styles.css">
@@ -19,78 +19,47 @@
 <body>
   <div class="page">
     <header class="site-header">
-      <a class="brand" href="../">ROSAY</a>
+      <a class="brand" href="../">Roselyn Chen</a>
       <nav class="site-nav" aria-label="Primary">
         <a href="../">Home</a>
-        <a href="./" aria-current="page">About</a>
+        <a href="../about/" aria-current="page">About</a>
         <a href="../archive/">Archive</a>
       </nav>
     </header>
 
-    <main class="layout">
+    <main class="layout home-layout">
       <aside class="side-rail">
         <section class="rail-block">
-          <p class="rail-label">Page</p>
-          <p class="rail-copy">Curriculum vitae / profile / links</p>
+          <p class="rail-label">Email</p>
+          <p class="rail-copy">wzzzynk@gmail.com</p>
         </section>
 
         <section class="rail-block">
-          <p class="rail-label">Topics</p>
-          <p class="rail-copy">AI systems, robotics, study, interfaces, and careful writing.</p>
-        </section>
-
-        <section class="rail-block">
-          <p class="rail-label">Contact</p>
-          <p class="rail-copy">hello@example.com</p>
+          <p class="rail-label">Links</p>
+          <p class="rail-copy"><a href="https://github.com/rosay4">GitHub</a> | LinkedIn: hong-yuan-chen-552361344</p>
         </section>
       </aside>
 
       <div class="content">
-        <section class="hero">
+        <section class="home-intro">
           <p class="eyebrow">About</p>
-          <h1>A compact CV-style page for context, background, and current direction.</h1>
-          <div class="hero-summary">
-            <p>
-              This page is where formal profile information lives, separate from the archive so the writing side of the site can stay editorial.
-            </p>
-          </div>
+          <h1>Profile and CV</h1>
+          <p class="intro-lead">Student developer focused on robotics, reinforcement learning, embodied intelligence, and real engineering workflows around control and hardware systems.</p>
         </section>
 
-        <section class="section-block">
-          <div class="section-head">
-            <p class="eyebrow">Profile</p>
-            <h2>Selected information</h2>
-          </div>
-
-          <div class="cv-grid">
-            <article class="cv-card">
-              <p class="card-label">About</p>
-              <p>Rosay is interested in machine learning, embodied intelligence, technical writing, and the craft of thoughtful interfaces.</p>
-            </article>
-
-            <article class="cv-card">
-              <p class="card-label">Current interests</p>
-              <ul class="plain-list">
-                <li>LLM post-training and applied AI systems</li>
-                <li>Robotics learning and control</li>
-                <li>Editorial website design</li>
-              </ul>
-            </article>
-
-            <article class="cv-card">
-              <p class="card-label">Links</p>
-              <ul class="plain-list">
-                <li>Resume</li>
-                <li>Projects</li>
-                <li>Publications</li>
-              </ul>
-            </article>
-
-            <article class="cv-card">
-              <p class="card-label">Now</p>
-              <p>Building a site structure that can support both professional context and longer-form public writing.</p>
-            </article>
-          </div>
+        <section class="tm-article-body page-markdown-body">
+          <h2 id="education">Education</h2>
+          <ul><li>Beihang University, M.Eng. in Electronic Information, 2026.09 - 2029.06 (incoming), Hangzhou</li><li>University of Shanghai for Science and Technology, B.Eng. in Robotics Engineering, 2022.09 - 2026.06, Shanghai</li><li>Coursework: Robot Dynamics and Control, Mathematical Principles of Reinforcement Learning, Machine Learning, Robot Sensing, Automatic Control, and C++ Programming</li></ul>
+          <h2 id="projects">Projects</h2>
+          <h3 id="wheeled-legged-robot-sim2real-development">Wheeled-legged robot Sim2Real development</h3>
+          <p>Built hardware extensions, ported communication protocols, created Isaac Sim training environments, imported and calibrated robot URDF assets, implemented cascade PID logic, and trained PPO-based end-to-end control policies for balancing and locomotion.</p>
+          <h3 id="omnidirectional-two-wheeled-balancing-robot">Omnidirectional two-wheeled balancing robot</h3>
+          <p>Designed controller and peripheral PCBs, resolved DC-DC and MCU pin-mux issues, processed IMU data for attitude estimation, and tuned cascade PID parameters for stable balancing in curved trajectories.</p>
+          <h2 id="experience">Experience</h2>
+          <h3 id="hillbot-sudo-tech">Hillbot / Sudo Tech</h3>
+          <p>Hardware testing and development intern (2026.01 - present). Built automated gripper testing scripts on top of low-level APIs, supported manipulator aging tests and data analysis, and reworked dashboard and Raspberry Pi agent backend flows for status tracking, reporting, and cloud command loops.</p>
+          <h2 id="skills">Skills</h2>
+          <ul><li>Robotics and simulation: Isaac Sim environment setup, asset import, ROS2 basics, and reinforcement learning fundamentals</li><li>Embedded and hardware: C/C++, embedded development, SolidWorks, and JLCEDA-based circuit design</li><li>Language: CET-6 534, CET-4 607</li></ul>
         </section>
       </div>
     </main>

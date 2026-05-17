@@ -3,100 +3,56 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rosay | Archive</title>
+  <title>Roselyn Chen | Archive</title>
   <meta
     name="description"
-    content="Writing archive with essays, notes, and project logs."
+    content="Archive for future writing, project notes, and technical posts generated from markdown."
   >
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
     rel="stylesheet"
   >
   <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
-  <div class="page">
-    <header class="site-header">
-      <a class="brand" href="../">ROSAY</a>
-      <nav class="site-nav" aria-label="Primary">
+  <div class="page page-article-ref">
+    <header class="tm-header">
+      <div class="tm-header-left">
+        <a class="tm-wordmark" href="../">Roselyn Chen</a>
+      </div>
+      <nav class="tm-top-nav" aria-label="Primary">
         <a href="../">Home</a>
         <a href="../about/">About</a>
         <a href="./" aria-current="page">Archive</a>
       </nav>
     </header>
 
-    <main class="layout">
-      <aside class="side-rail">
-        <section class="rail-block">
-          <p class="rail-label">Archive</p>
-          <p class="rail-copy">Essays, build logs, and notebook-style posts.</p>
-        </section>
-
-        <section class="rail-block">
-          <p class="rail-label">Post paths</p>
-          <p class="rail-copy">Future single pieces should live under <code>/archive/slug/</code>.</p>
-        </section>
-
-        <section class="rail-block">
-          <p class="rail-label">Featured</p>
-          <p class="rail-copy">One stronger lead story, followed by a restrained list archive.</p>
-        </section>
+    <main class="tm-main">
+      <aside class="tm-toc" aria-label="On this page">
+        <a href="#archive-top">Introduction</a>
+        <a href="#selected-posts">Selected posts</a>
       </aside>
 
-      <div class="content">
-        <section class="lead-entry">
-          <div class="entry-meta">
-            <p class="eyebrow">Archive</p>
-            <p class="meta-inline">May 17, 2026</p>
+      <div class="tm-content">
+        <section id="archive-top" class="tm-hero">
+          <p class="tm-kicker">Archive</p>
+          <h1>Writing archive for future technical posts and project notes.</h1>
+          <div class="tm-meta">
+            <span>Roselyn Chen</span>
+            <span>May 2026</span>
           </div>
-          <h1 class="archive-page-title">Writing that reads like a publication.</h1>
-          <p class="lead-copy">
-            This page is for longer pieces and project notes, kept separate from the homepage so the archive can use a more article-like pace and hierarchy.
+          <p class="tm-intro">
+            This page is generated from markdown source files. Future writing on robotics, reinforcement learning, simulation, testing workflows, and project retrospectives will appear here.
           </p>
         </section>
 
-        <section class="archive-section">
-          <div class="section-head">
-            <p class="eyebrow">Recent posts</p>
-            <h2>Selected writing</h2>
-          </div>
-
-          <article class="archive-item">
-            <div class="archive-index">
-              <span>01</span>
-              <span>Essay</span>
-            </div>
-            <div class="archive-main">
-              <h3><a href="./publication-not-stream/">What I want from a personal website that also functions like a research notebook.</a></h3>
-              <p>On combining author identity, project context, and long-form writing without turning the homepage into a landing page.</p>
-            </div>
-            <div class="archive-date">May 2026</div>
-          </article>
-
-          <article class="archive-item">
-            <div class="archive-index">
-              <span>02</span>
-              <span>Build log</span>
-            </div>
-            <div class="archive-main">
-              <h3>Adapting editorial design patterns from lab websites to a one-person portfolio.</h3>
-              <p>Notes on navigation scale, side rails, typographic density, and the role of whitespace in technical writing.</p>
-            </div>
-            <div class="archive-date">May 2026</div>
-          </article>
-
-          <article class="archive-item">
-            <div class="archive-index">
-              <span>03</span>
-              <span>Notebook</span>
-            </div>
-            <div class="archive-main">
-              <h3>Research notes, study logs, and personal essays deserve the same level of visual discipline.</h3>
-              <p>A framework for publishing informal writing in a way that still feels coherent, readable, and worth returning to.</p>
-            </div>
-            <div class="archive-date">Apr 2026</div>
+        <section id="selected-posts" class="tm-article-body tm-archive-list">
+          <h2>Selected posts</h2>
+          <article class="tm-list-item">
+            <h3><a href="./publication-not-stream/">Designing a Personal Research Archive for Writing, Projects, and Technical Notes</a></h3>
+            <p>Notes on using a publication-like archive for technical posts, project retrospectives, and future markdown-driven writing.</p>
           </article>
         </section>
       </div>
