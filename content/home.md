@@ -5,7 +5,7 @@ description: Roselyn Chen's personal homepage, focused on robotics, reinforcemen
 intro_title: Roselyn Chen
 intro_text: Incoming M.Eng. student in Electronic Information at Beihang University, previously majoring in Robotics Engineering at the University of Shanghai for Science and Technology.
 rail_one_label: Contact
-rail_one_text: wzzzynk@gmail.com | [GitHub](https://github.com/rosay4)
+rail_one_text: wzzzynk@gmail.com [GitHub](https://github.com/rosay4)
 rail_two_label: Focus
 rail_two_text: Robotics, reinforcement learning, embodied intelligence, and simulation-to-real systems.
 ---

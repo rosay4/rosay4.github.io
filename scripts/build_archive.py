@@ -88,7 +88,7 @@ def render_inline(text: str) -> str:
     escaped = re.sub(
         r"\[([^\]]+)\]\(([^)]+)\)",
         lambda m: (
-            f'<a href="{escape(m.group(2), quote=True)}">{GITHUB_SVG}{m.group(1)}</a>'
+            f'<a href="{escape(m.group(2), quote=True)}" aria-label="{escape(m.group(1), quote=True)}">{GITHUB_SVG}</a>'
             if m.group(2).startswith("https://github.com/")
             else f'<a href="{escape(m.group(2), quote=True)}">{m.group(1)}</a>'
         ),
@@ -96,7 +96,7 @@ def render_inline(text: str) -> str:
     )
     escaped = re.sub(
         r"([\w.+-]+@[\w-]+\.[\w.-]+)",
-        lambda m: f'<a href="mailto:{m.group(1)}">{EMAIL_SVG}{m.group(1)}</a>',
+        lambda m: f'<a href="mailto:{m.group(1)}" aria-label="Email">{EMAIL_SVG}</a>',
         escaped,
     )
     escaped = re.sub(r"`([^`]+)`", lambda m: f"<code>{m.group(1)}</code>", escaped)
