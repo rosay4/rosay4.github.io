@@ -7,7 +7,7 @@ intro_text: Student developer focused on robotics, reinforcement learning, embod
 rail_one_label: Email
 rail_one_text: wzzzynk@gmail.com
 rail_two_label: Links
-rail_two_text: [GitHub](https://github.com/rosay4) | LinkedIn: hong-yuan-chen-552361344
+rail_two_text: [GitHub](https://github.com/rosay4)
 ---
 
 ## Education

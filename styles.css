@@ -386,6 +386,13 @@ code {
   padding-left: 12px;
 }
 
+.icon {
+  display: inline-block;
+  vertical-align: -3px;
+  margin-right: 4px;
+  fill: currentColor;
+}
+
 @media (max-width: 980px) {
   .layout,
   .tm-main {
