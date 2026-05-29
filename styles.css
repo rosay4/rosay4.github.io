@@ -340,12 +340,40 @@ code {
 
 .tm-article-body details > summary {
   display: block;
+  list-style: none;
   cursor: pointer;
+}
+
+.tm-article-body details > summary::-webkit-details-marker,
+.tm-article-body details > summary::marker {
+  display: none;
+  content: "";
 }
 
 .tm-article-body details > summary > * {
   display: inline;
   margin: 0;
+}
+
+/* Folding animation */
+.tm-article-body details > .section-inner {
+  display: grid;
+  grid-template-rows: 1fr;
+  overflow: hidden;
+  transition: grid-template-rows 0.25s ease;
+}
+
+.tm-article-body details.closing > .section-inner {
+  grid-template-rows: 0fr;
+}
+
+.tm-article-body details.opening > .section-inner {
+  grid-template-rows: 1fr;
+}
+
+.tm-article-body details > .section-inner > .section-content {
+  min-height: 0;
+  overflow: hidden;
 }
 
 .tm-archive-list {
@@ -429,7 +457,14 @@ code {
 
 .tm-toc details > summary {
   display: block;
+  list-style: none;
   cursor: pointer;
+}
+
+.tm-toc details > summary::-webkit-details-marker,
+.tm-toc details > summary::marker {
+  display: none;
+  content: "";
 }
 
 .tm-toc a {

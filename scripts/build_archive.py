@@ -48,7 +48,7 @@ class Page:
 
 def slugify(text: str) -> str:
     text = text.lower().strip()
-    text = re.sub(r"[^a-z0-9\s-]", "", text)
+    text = re.sub(r"[^\w一-鿿぀-ゟ゠-ヿ\s-]", "", text, flags=re.UNICODE)
     text = re.sub(r"\s+", "-", text)
     text = re.sub(r"-+", "-", text)
     return text.strip("-")
@@ -387,7 +387,7 @@ def wrap_sections(body_html: str) -> str:
                         i += 1
 
                 inner = "".join(content_parts) + build_tree(child_parts, level + 1)
-                html += f'<details open data-section="{slug}" class="section-h{level}"><summary><h{level} id="{slug}">{text}</h{level}></summary>{inner}</details>'
+                html += f'<details open data-section="{slug}" class="section-h{level}"><summary><h{level} id="{slug}">{text}</h{level}></summary><div class="section-inner"><div class="section-content">{inner}</div></div></details>'
             else:
                 html += items[i]
                 i += 1
@@ -574,19 +574,52 @@ def render_post(post: Post) -> str:
     var toc = document.querySelector('.tm-toc');
     var body = document.querySelector('.tm-article-body');
     if (!toc || !body) return;
-    var syncing = false;
-    function sync(from, to) {{
-      if (syncing) return;
-      syncing = true;
-      var id = from.getAttribute('data-section');
-      if (id) {{
-        var target = to.querySelector('[data-section="' + id + '"]');
-        if (target && target.open !== from.open) target.open = from.open;
+    var animating = new Set();
+    var DURATION = 250;
+
+    function animateToggle(el, open) {{
+      var inner = el.querySelector('.section-inner');
+      if (!inner) {{ el.open = open; return; }}
+      if (open) {{
+        el.open = true;
+        el.classList.remove('closing');
+        el.classList.add('opening');
+        inner.style.gridTemplateRows = '1fr';
+        var heading = el.querySelector('summary > *');
+        if (heading) heading.scrollIntoView({{ block: 'start', behavior: 'smooth' }});
+        setTimeout(function() {{ el.classList.remove('opening'); inner.style.gridTemplateRows = ''; }}, DURATION);
+      }} else {{
+        animating.add(el);
+        el.classList.add('closing');
+        requestAnimationFrame(function() {{
+          inner.style.gridTemplateRows = '0fr';
+          setTimeout(function() {{
+            el.open = false;
+            el.classList.remove('closing');
+            inner.style.gridTemplateRows = '';
+            animating.delete(el);
+          }}, DURATION);
+        }});
       }}
-      syncing = false;
     }}
-    toc.addEventListener('toggle', function(e) {{ sync(e.target, body); }}, true);
-    body.addEventListener('toggle', function(e) {{ sync(e.target, toc); }}, true);
+
+    function sync(from, to, animate) {{
+      var id = from.getAttribute('data-section');
+      if (!id) return;
+      var target = to.querySelector('[data-section="' + id + '"]');
+      if (!target || target.open === from.open || animating.has(target)) return;
+      if (animate) animateToggle(target, from.open);
+      else target.open = from.open;
+    }}
+
+    body.addEventListener('toggle', function(e) {{
+      if (animating.has(e.target)) return;
+      sync(e.target, toc, false);
+    }}, true);
+
+    toc.addEventListener('toggle', function(e) {{
+      sync(e.target, body, true);
+    }}, true);
   }})();
   </script>
 </body>
