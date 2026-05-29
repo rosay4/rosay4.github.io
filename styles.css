@@ -469,6 +469,7 @@ code {
   font-size: 12px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  animation: lewm-chip-glow 3.2s ease-in-out infinite;
 }
 
 .lewm-arrow {
@@ -476,6 +477,20 @@ code {
   background: linear-gradient(90deg, transparent, #7695a7, transparent);
   transform-origin: left;
   animation: lewm-pulse-line 2.8s ease-in-out infinite;
+  position: relative;
+}
+
+.lewm-arrow::after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: 0;
+  width: 8px;
+  height: 5px;
+  border-radius: 50%;
+  background: #4a8aaa;
+  box-shadow: 0 0 8px rgba(74, 138, 170, 0.6);
+  animation: lewm-flow-dot 2s ease-in-out infinite;
 }
 
 .lewm-latent-cloud {
@@ -484,6 +499,7 @@ code {
   border: 1px solid #d7e0e5;
   border-radius: 50%;
   animation: lewm-breathe 4.8s ease-in-out infinite;
+  background: radial-gradient(circle, rgba(49, 93, 120, 0.04), transparent 70%);
 }
 
 .lewm-latent-cloud span,
@@ -538,7 +554,8 @@ code {
   width: 220px;
   height: 132px;
   clip-path: polygon(0 0, 100% 44%, 100% 56%, 0 100%);
-  background: linear-gradient(90deg, rgba(80, 112, 130, 0.1), rgba(80, 112, 130, 0.26));
+  background: linear-gradient(90deg, rgba(80, 112, 130, 0.08), rgba(180, 80, 80, 0.18));
+  animation: collapse-funnel-pulse 4s ease-in-out infinite;
 }
 
 .collapse-zero {
@@ -549,7 +566,9 @@ code {
   height: 58px;
   border-radius: 50%;
   font-family: var(--sans);
+  font-size: 18px;
   animation: zero-lock 4s ease-in-out infinite;
+  border-color: #c0a0a0;
 }
 
 .collapse-loss {
@@ -578,6 +597,7 @@ code {
   border: 1px solid #cfdbe1;
   border-radius: 50%;
   animation: sigreg-breathe 5s ease-in-out infinite;
+  background: radial-gradient(circle, rgba(49, 93, 120, 0.05), transparent 70%);
 }
 
 .sigreg-cloud span:nth-child(1) { left: 30%; top: 22%; }
@@ -596,10 +616,11 @@ code {
   left: 13%;
   top: 50%;
   width: 74%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(55, 93, 115, 0.9), transparent);
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, rgba(55, 93, 115, 0.15) 15%, rgba(55, 93, 115, 0.9) 50%, rgba(55, 93, 115, 0.15) 85%, transparent 100%);
   transform-origin: center;
-  animation: beam-scan 4.2s ease-in-out infinite;
+  animation: beam-scan 3.5s ease-in-out infinite;
+  box-shadow: 0 0 12px rgba(55, 93, 115, 0.3);
 }
 
 .beam-b {
@@ -630,7 +651,7 @@ code {
   border: 1px solid #8aa1ae;
   border-bottom: 0;
   border-radius: 60px 60px 0 0;
-  opacity: 0.75;
+  background: linear-gradient(180deg, rgba(55, 93, 115, 0.12), transparent);
   animation: normal-curve 3.6s ease-in-out infinite;
 }
 
@@ -647,6 +668,7 @@ code {
   min-height: 118px;
   padding: 18px;
   text-align: center;
+  transition: box-shadow 0.3s;
 }
 
 .loss-term span {
@@ -674,7 +696,7 @@ code {
   position: relative;
   height: 280px;
   border: 1px solid #d7e0e5;
-  background: rgba(255, 255, 255, 0.7);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(240, 248, 255, 0.6));
 }
 
 .state {
@@ -694,6 +716,7 @@ code {
   right: 44px;
   top: 42px;
   border-color: #7f9aaa;
+  animation: goal-pulse 3s ease-in-out infinite;
 }
 
 .path {
@@ -720,6 +743,7 @@ code {
 .path-best {
   border-top-color: #315d78;
   transform: rotate(-27deg);
+  box-shadow: 0 -4px 16px rgba(49, 93, 120, 0.15);
 }
 
 .planner-dot {
@@ -730,6 +754,7 @@ code {
   height: 10px;
   border-radius: 50%;
   background: #315d78;
+  box-shadow: 0 0 12px rgba(49, 93, 120, 0.5), 0 0 24px rgba(49, 93, 120, 0.2);
   animation: plan-rollout 5s ease-in-out infinite;
 }
 
@@ -744,50 +769,93 @@ code {
   }
 }
 
-@keyframes lewm-breathe {
+@keyframes lewm-flow-dot {
+  0% {
+    left: -8px;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    left: calc(100% - 4px);
+    opacity: 0;
+  }
+}
+
+@keyframes lewm-chip-glow {
   0%, 100% {
-    transform: scale(0.96);
+    box-shadow: 0 10px 28px rgba(20, 54, 75, 0.06);
   }
   50% {
-    transform: scale(1.03);
+    box-shadow: 0 10px 28px rgba(20, 54, 75, 0.06), 0 0 16px rgba(49, 93, 120, 0.12);
+  }
+}
+
+@keyframes lewm-breathe {
+  0%, 100% {
+    transform: scale(0.96) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.03) rotate(1.5deg);
   }
 }
 
 @keyframes collapse-slide {
-  0%, 15% {
+  0%, 12% {
     transform: translateX(0);
     opacity: 1;
   }
-  65%, 100% {
-    transform: translateX(220px) scale(0.6);
-    opacity: 0.35;
+  55%, 70% {
+    transform: translateX(200px) scale(0.4);
+    opacity: 0.2;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
   }
 }
 
 @keyframes sigreg-breathe {
   0%, 100% {
-    transform: translate(-50%, -50%) scale(0.96);
+    transform: translate(-50%, -50%) scale(0.96) rotate(0deg);
   }
   50% {
-    transform: translate(-50%, -50%) scale(1.03);
+    transform: translate(-50%, -50%) scale(1.03) rotate(2deg);
   }
 }
 
 @keyframes zero-lock {
   0%, 100% {
     box-shadow: 0 0 0 rgba(49, 93, 120, 0);
+    border-color: #c0a0a0;
   }
   50% {
-    box-shadow: 0 0 0 14px rgba(49, 93, 120, 0.08);
+    box-shadow: 0 0 0 16px rgba(180, 80, 80, 0.12), 0 0 24px rgba(180, 80, 80, 0.08);
+    border-color: #b07070;
+  }
+}
+
+@keyframes collapse-funnel-pulse {
+  0%, 100% {
+    background: linear-gradient(90deg, rgba(80, 112, 130, 0.08), rgba(180, 80, 80, 0.12));
+  }
+  50% {
+    background: linear-gradient(90deg, rgba(80, 112, 130, 0.12), rgba(180, 80, 80, 0.22));
   }
 }
 
 @keyframes beam-scan {
   0%, 100% {
-    opacity: 0.25;
+    opacity: 0.15;
+    transform: scaleX(0.7);
   }
   50% {
-    opacity: 0.95;
+    opacity: 1;
+    transform: scaleX(1.05);
   }
 }
 
@@ -805,10 +873,11 @@ code {
 @keyframes sigreg-glow {
   0%, 100% {
     border-color: #cbd6dc;
+    box-shadow: 0 10px 28px rgba(20, 54, 75, 0.06);
   }
   50% {
-    border-color: #7798aa;
-    box-shadow: 0 18px 36px rgba(49, 93, 120, 0.12);
+    border-color: #5a8a9e;
+    box-shadow: 0 18px 40px rgba(49, 93, 120, 0.18), 0 0 20px rgba(49, 93, 120, 0.08);
   }
 }
 
@@ -824,6 +893,15 @@ code {
   }
   100% {
     transform: translate(0, 0);
+  }
+}
+
+@keyframes goal-pulse {
+  0%, 100% {
+    box-shadow: 0 10px 28px rgba(20, 54, 75, 0.06);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(127, 154, 170, 0.12), 0 10px 28px rgba(20, 54, 75, 0.06);
   }
 }
 
