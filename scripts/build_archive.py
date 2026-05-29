@@ -29,6 +29,7 @@ class Post:
     summary: str
     body_html: str
     headings: list[Heading]
+    math: bool = False
 
 
 @dataclass
@@ -86,6 +87,20 @@ EMAIL_SVG = '<svg class="icon" viewBox="0 0 16 16" width="16" height="16" fill="
 
 
 def render_inline(text: str) -> str:
+    # Extract math expressions before HTML escaping to preserve LaTeX syntax
+    math_store: list[tuple[str, str]] = []  # (placeholder, latex)
+
+    def _save_math(m: re.Match) -> str:
+        is_display = m.group(1) is not None
+        latex = m.group(1) if is_display else m.group(2)
+        idx = len(math_store)
+        kind = "display" if is_display else "inline"
+        placeholder = f"\x00MATH_{kind}_{idx}\x00"
+        math_store.append((placeholder, latex))
+        return placeholder
+
+    text = re.sub(r"\$\$(.+?)\$\$|\$(.+?)\$", _save_math, text, flags=re.DOTALL)
+
     escaped = escape(text)
     escaped = re.sub(
         r"!\[([^\]]*)\]\(([^)]+)\)",
@@ -107,6 +122,15 @@ def render_inline(text: str) -> str:
         escaped,
     )
     escaped = re.sub(r"`([^`]+)`", lambda m: f"<code>{m.group(1)}</code>", escaped)
+
+    # Restore math expressions as KaTeX elements
+    for placeholder, latex in math_store:
+        if "display" in placeholder:
+            replacement = f'<span class="katex-display">{latex}</span>'
+        else:
+            replacement = f'<span class="katex">{latex}</span>'
+        escaped = escaped.replace(placeholder, replacement)
+
     return escaped
 
 
@@ -248,6 +272,39 @@ def markdown_to_html(markdown: str) -> tuple[str, list[Heading]]:
             ordered_list_items.append(ordered.group(1))
             continue
 
+        if clean.startswith("###### "):
+            flush_paragraph()
+            flush_list()
+            flush_ordered_list()
+            flush_quote()
+            text = clean[7:].strip()
+            slug = unique_slug(text, used_slugs, f"section-{len(headings) + 1}")
+            headings.append(Heading(6, text, slug))
+            html_parts.append(f'<h6 id="{slug}">{render_inline(text)}</h6>')
+            continue
+
+        if clean.startswith("##### "):
+            flush_paragraph()
+            flush_list()
+            flush_ordered_list()
+            flush_quote()
+            text = clean[6:].strip()
+            slug = unique_slug(text, used_slugs, f"section-{len(headings) + 1}")
+            headings.append(Heading(5, text, slug))
+            html_parts.append(f'<h5 id="{slug}">{render_inline(text)}</h5>')
+            continue
+
+        if clean.startswith("#### "):
+            flush_paragraph()
+            flush_list()
+            flush_ordered_list()
+            flush_quote()
+            text = clean[5:].strip()
+            slug = unique_slug(text, used_slugs, f"section-{len(headings) + 1}")
+            headings.append(Heading(4, text, slug))
+            html_parts.append(f'<h4 id="{slug}">{render_inline(text)}</h4>')
+            continue
+
         if clean.startswith("### "):
             flush_paragraph()
             flush_list()
@@ -295,11 +352,77 @@ def markdown_to_html(markdown: str) -> tuple[str, list[Heading]]:
     return "\n          ".join(html_parts), headings
 
 
+_HEADING_RE = re.compile(r"<h([1-6])\s+id=\"([^\"]+)\">(.+?)</h\1>")
+
+
+def wrap_sections(body_html: str) -> str:
+    """Wrap content between headings in collapsible <details> elements."""
+    parts = _HEADING_RE.split(body_html)
+    # parts: [pre, level, id, text, content, level, id, text, content, ...]
+
+    if len(parts) < 4:
+        return body_html
+
+    def build_tree(items: list, min_level: int = 1) -> str:
+        html = ""
+        i = 0
+        while i < len(items):
+            if isinstance(items[i], tuple):
+                level, slug, text = items[i]
+                if level < min_level:
+                    break
+                # Collect content until next heading of same or higher level
+                content_parts = []
+                i += 1
+                while i < len(items) and not isinstance(items[i], tuple):
+                    content_parts.append(items[i])
+                    i += 1
+                # Collect child sections (deeper headings)
+                child_parts = []
+                while i < len(items) and isinstance(items[i], tuple) and items[i][0] > level:
+                    child_parts.append(items[i])
+                    i += 1
+                    while i < len(items) and not isinstance(items[i], tuple):
+                        child_parts.append(items[i])
+                        i += 1
+
+                inner = "".join(content_parts) + build_tree(child_parts, level + 1)
+                html += f'<details open data-section="{slug}" class="section-h{level}"><summary><h{level} id="{slug}">{text}</h{level}></summary>{inner}</details>'
+            else:
+                html += items[i]
+                i += 1
+        return html
+
+    # Parse parts into structured items
+    items = []
+    idx = 1  # skip pre-content (parts[0])
+    while idx < len(parts) - 2:
+        level = int(parts[idx])
+        slug = parts[idx + 1]
+        text = parts[idx + 2]
+        items.append((level, slug, text))
+        idx += 3
+        if idx < len(parts):
+            items.append(parts[idx])
+            idx += 1
+
+    # Add any trailing content
+    while idx < len(parts):
+        items.append(parts[idx])
+        idx += 1
+
+    # Also add pre-content
+    pre = parts[0]
+    result = build_tree(items)
+    return pre + result
+
+
 def load_posts() -> list[Post]:
     posts: list[Post] = []
     for path in sorted(POSTS_DIR.glob("*.md")):
         metadata, markdown = parse_frontmatter(path.read_text(encoding="utf-8"))
         body_html, headings = markdown_to_html(markdown)
+        body_html = wrap_sections(body_html)
         posts.append(
             Post(
                 slug=path.stem,
@@ -310,6 +433,7 @@ def load_posts() -> list[Post]:
                 summary=metadata.get("summary", ""),
                 body_html=body_html,
                 headings=headings,
+                math=metadata.get("math", "").lower() == "true",
             )
         )
     return posts
@@ -333,14 +457,65 @@ def load_page(name: str) -> Page:
 
 
 def render_toc(post: Post) -> str:
-    lines = []
-    for heading in post.headings:
-        klass = ' class="tm-toc-child"' if heading.level == 3 else ""
-        lines.append(f'        <a{klass} href="#{heading.slug}">{escape(heading.text)}</a>')
-    return "\n".join(lines)
+    def _build_toc(headings: list[Heading], depth: int = 0) -> tuple[str, int]:
+        lines = []
+        i = 0
+        while i < len(headings):
+            h = headings[i]
+            children = []
+            j = i + 1
+            while j < len(headings) and headings[j].level > h.level:
+                children.append(headings[j])
+                j += 1
+
+            indent = "    " * (depth + 2)
+            if children:
+                inner, _ = _build_toc(children, depth + 1)
+                lines.append(f'{indent}<details open data-section="{h.slug}" class="tm-toc-h{h.level}"><summary><a href="#{h.slug}">{escape(h.text)}</a></summary>')
+                lines.append(inner)
+                lines.append(f'{indent}</details>')
+            else:
+                lines.append(f'{indent}<a class="tm-toc-h{h.level}" href="#{h.slug}">{escape(h.text)}</a>')
+
+            i = j
+        return "\n".join(lines), 0
+
+    if not post.headings:
+        return ""
+    min_level = min(h.level for h in post.headings)
+    result_lines = []
+    i = 0
+    all_headings = post.headings
+    while i < len(all_headings):
+        h = all_headings[i]
+        if h.level == min_level:
+            children = []
+            j = i + 1
+            while j < len(all_headings) and all_headings[j].level > min_level:
+                children.append(all_headings[j])
+                j += 1
+
+            if children:
+                inner, _ = _build_toc(children, 1)
+                result_lines.append(f'        <details open data-section="{h.slug}" class="tm-toc-h{h.level}"><summary><a href="#{h.slug}">{escape(h.text)}</a></summary>')
+                result_lines.append(inner)
+                result_lines.append(f'        </details>')
+            else:
+                result_lines.append(f'        <a class="tm-toc-h{h.level}" href="#{h.slug}">{escape(h.text)}</a>')
+            i = j
+        else:
+            i += 1
+
+    return "\n".join(result_lines)
 
 
 def render_post(post: Post) -> str:
+    katex_head = ""
+    if post.math:
+        katex_head = """
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"
+    onload="document.querySelectorAll('.katex-display,.katex').forEach(function(el){katex.render(el.textContent,el,{displayMode:el.classList.contains('katex-display')})})"></script>"""
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -358,6 +533,7 @@ def render_post(post: Post) -> str:
     rel="stylesheet"
   >
   <link rel="stylesheet" href="../../styles.css">
+  {katex_head}
 </head>
 <body>
   <div class="page page-article-ref">
@@ -393,6 +569,26 @@ def render_post(post: Post) -> str:
       </article>
     </main>
   </div>
+  <script>
+  (function() {{
+    var toc = document.querySelector('.tm-toc');
+    var body = document.querySelector('.tm-article-body');
+    if (!toc || !body) return;
+    var syncing = false;
+    function sync(from, to) {{
+      if (syncing) return;
+      syncing = true;
+      var id = from.getAttribute('data-section');
+      if (id) {{
+        var target = to.querySelector('[data-section="' + id + '"]');
+        if (target && target.open !== from.open) target.open = from.open;
+      }}
+      syncing = false;
+    }}
+    toc.addEventListener('toggle', function(e) {{ sync(e.target, body); }}, true);
+    body.addEventListener('toggle', function(e) {{ sync(e.target, toc); }}, true);
+  }})();
+  </script>
 </body>
 </html>
 """

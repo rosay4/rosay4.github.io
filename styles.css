@@ -308,6 +308,53 @@ code {
   font-weight: 600;
 }
 
+.tm-article-body h4 {
+  margin: 28px 0 12px;
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 26px;
+  font-weight: 600;
+}
+
+.tm-article-body h5 {
+  margin: 24px 0 10px;
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 24px;
+  font-weight: 600;
+}
+
+.tm-article-body h6 {
+  margin: 20px 0 8px;
+  font-family: var(--serif);
+  font-size: 14px;
+  line-height: 22px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* Content folding */
+.tm-article-body details {
+  margin: 0;
+}
+
+.tm-article-body details > summary {
+  list-style: none;
+  display: block;
+  cursor: pointer;
+}
+
+.tm-article-body details > summary::-webkit-details-marker,
+.tm-article-body details > summary::marker {
+  display: none;
+  content: "";
+}
+
+.tm-article-body details > summary > * {
+  display: inline;
+  margin: 0;
+}
+
 .tm-archive-list {
   padding-top: 0;
 }
@@ -382,9 +429,40 @@ code {
   line-height: 28px;
 }
 
-.tm-toc-child {
-  padding-left: 12px;
+/* TOC hierarchical styles */
+.tm-toc details {
+  margin: 0;
 }
+
+.tm-toc details > summary {
+  list-style: none;
+  display: block;
+  cursor: pointer;
+}
+
+.tm-toc details > summary::-webkit-details-marker,
+.tm-toc details > summary::marker {
+  display: none;
+  content: "";
+}
+
+.tm-toc a {
+  display: block;
+  text-decoration: none;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 20px;
+  padding: 2px 0;
+}
+
+.tm-toc a:hover {
+  color: var(--text);
+}
+
+.tm-toc .tm-toc-h3 { padding-left: 12px; }
+.tm-toc .tm-toc-h4 { padding-left: 24px; }
+.tm-toc .tm-toc-h5 { padding-left: 36px; }
+.tm-toc .tm-toc-h6 { padding-left: 48px; }
 
 .icon {
   display: inline-block;
@@ -961,4 +1039,19 @@ code {
     transform-origin: top left;
     width: 116%;
   }
+}
+
+/* KaTeX math */
+.katex-display {
+  text-align: center;
+  margin: 1.5em 0;
+}
+
+.katex {
+  font-size: 1.1em;
+  white-space: normal;
+}
+
+.katex-display > .katex {
+  font-size: 1.2em;
 }

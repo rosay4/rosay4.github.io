@@ -15,6 +15,7 @@
     rel="stylesheet"
   >
   <link rel="stylesheet" href="../../styles.css">
+  
 </head>
 <body>
   <div class="page page-article-ref">
@@ -31,13 +32,13 @@
 
     <main class="tm-main">
       <aside class="tm-toc" aria-label="On this page">
-        <a href="#lewm">一句话看懂 LeWM</a>
-        <a href="#section-2">表征崩溃</a>
-        <a href="#sigreg">SIGReg 的直觉</a>
-        <a href="#section-4">训练目标</a>
-        <a href="#section-5">用世界模型规划</a>
-        <a href="#section-6">为什么值得看</a>
-        <a href="#section-7">复现提示</a>
+        <a class="tm-toc-h2" href="#lewm">一句话看懂 LeWM</a>
+        <a class="tm-toc-h2" href="#section-2">表征崩溃</a>
+        <a class="tm-toc-h2" href="#sigreg">SIGReg 的直觉</a>
+        <a class="tm-toc-h2" href="#section-4">训练目标</a>
+        <a class="tm-toc-h2" href="#section-5">用世界模型规划</a>
+        <a class="tm-toc-h2" href="#section-6">为什么值得看</a>
+        <a class="tm-toc-h2" href="#section-7">复现提示</a>
       </aside>
 
       <article class="tm-content">
@@ -51,7 +52,7 @@
         </header>
 
         <section class="tm-article-body">
-          <h2 id="lewm">一句话看懂 LeWM</h2>
+          <details open data-section="lewm" class="section-h2"><summary><h2 id="lewm">一句话看懂 LeWM</h2></summary>
           <p>LeWM 想解决一个朴素但致命的问题：世界模型训练时，编码器可能把所有画面都映射成同一个向量，预测误差看起来很小，但表示已经失效。</p>
           <section class="lewm-stage lewm-stage-overview" aria-label="LeWM overview animation">
   <div class="lewm-copy">
@@ -72,7 +73,7 @@
     <div class="lewm-frame">z<sub>t+1</sub></div>
   </div>
 </section>
-          <h2 id="section-2">表征崩溃</h2>
+          </details><details open data-section="section-2" class="section-h2"><summary><h2 id="section-2">表征崩溃</h2></summary>
           <p>如果只优化预测误差，模型会发现一条捷径：所有输入都编码成 0。预测值和目标值都变成 0，loss 很低，但特征没有任何辨别力。</p>
           <section class="lewm-stage lewm-collapse" aria-label="Representation collapse animation">
   <div class="lewm-copy">
@@ -88,7 +89,7 @@
     <div class="collapse-loss">loss ↓</div>
   </div>
 </section>
-          <h2 id="sigreg">SIGReg 的直觉</h2>
+          </details><details open data-section="sigreg" class="section-h2"><summary><h2 id="sigreg">SIGReg 的直觉</h2></summary>
           <p>SIGReg 不让特征挤成一个点。它随机抽很多方向，把高维特征投影成一维，再检查每条投影是否像正态分布。</p>
           <section class="lewm-stage lewm-sigreg" aria-label="SIGReg projection animation">
   <div class="lewm-copy">
@@ -108,7 +109,7 @@
     <div class="projection projection-c"></div>
   </div>
 </section>
-          <h2 id="section-4">训练目标</h2>
+          </details><details open data-section="section-4" class="section-h2"><summary><h2 id="section-4">训练目标</h2></summary>
           <p>LeWM 的训练目标很干净：预测未来，同时约束当前 batch 的表示分布。</p>
           <pre><code class="language-python">loss = pred_loss + lambda_ * sigreg_loss</code></pre>
           <section class="lewm-stage lewm-loss" aria-label="LeWM loss animation">
@@ -127,7 +128,7 @@
     <p>稳定端到端训练</p>
   </div>
 </section>
-          <h2 id="section-5">用世界模型规划</h2>
+          </details><details open data-section="section-5" class="section-h2"><summary><h2 id="section-5">用世界模型规划</h2></summary>
           <p>训练完成后，LeWM 在潜在空间里“想象”未来：采样动作序列，滚动预测 H 步，选择最接近目标的那条轨迹。</p>
           <section class="lewm-stage lewm-planning" aria-label="Planning in latent space animation">
   <div class="lewm-copy">
@@ -143,13 +144,33 @@
     <div class="planner-dot"></div>
   </div>
 </section>
-          <h2 id="section-6">为什么值得看</h2>
+          </details><details open data-section="section-6" class="section-h2"><summary><h2 id="section-6">为什么值得看</h2></summary>
           <ul><li>理论动机更清楚：用分布约束切断崩溃捷径。</li><li>结构更简单：Encoder + Predictor，没有老师学生双网络。</li><li>超参数更少：主要关注投影数量 <code>M</code> 和权重 <code>lambda</code>。</li><li>更适合从零训练：不用把上限交给冻结的预训练视觉模型。</li></ul>
-          <h2 id="section-7">复现提示</h2>
-          <p>先从简单环境开始，例如 <code>tworoom</code>。如果任务很简单，过高的潜在维度可能反而不自然；如果环境更复杂，可以优先观察 SIGReg 权重、投影数和训练曲线稳定性。</p>
+          </details><details open data-section="section-7" class="section-h2"><summary><h2 id="section-7">复现提示</h2></summary>
+          <p>先从简单环境开始，例如 <code>tworoom</code>。如果任务很简单，过高的潜在维度可能反而不自然；如果环境更复杂，可以优先观察 SIGReg 权重、投影数和训练曲线稳定性。</p></details>
         </section>
       </article>
     </main>
   </div>
+  <script>
+  (function() {
+    var toc = document.querySelector('.tm-toc');
+    var body = document.querySelector('.tm-article-body');
+    if (!toc || !body) return;
+    var syncing = false;
+    function sync(from, to) {
+      if (syncing) return;
+      syncing = true;
+      var id = from.getAttribute('data-section');
+      if (id) {
+        var target = to.querySelector('[data-section="' + id + '"]');
+        if (target && target.open !== from.open) target.open = from.open;
+      }
+      syncing = false;
+    }
+    toc.addEventListener('toggle', function(e) { sync(e.target, body); }, true);
+    body.addEventListener('toggle', function(e) { sync(e.target, toc); }, true);
+  })();
+  </script>
 </body>
 </html>
