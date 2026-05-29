@@ -339,15 +339,8 @@ code {
 }
 
 .tm-article-body details > summary {
-  list-style: none;
   display: block;
   cursor: pointer;
-}
-
-.tm-article-body details > summary::-webkit-details-marker,
-.tm-article-body details > summary::marker {
-  display: none;
-  content: "";
 }
 
 .tm-article-body details > summary > * {
@@ -435,15 +428,8 @@ code {
 }
 
 .tm-toc details > summary {
-  list-style: none;
   display: block;
   cursor: pointer;
-}
-
-.tm-toc details > summary::-webkit-details-marker,
-.tm-toc details > summary::marker {
-  display: none;
-  content: "";
 }
 
 .tm-toc a {
