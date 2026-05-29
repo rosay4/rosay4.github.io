@@ -50,7 +50,14 @@ def slugify(text: str) -> str:
     text = re.sub(r"[^a-z0-9\s-]", "", text)
     text = re.sub(r"\s+", "-", text)
     text = re.sub(r"-+", "-", text)
-    return text
+    return text.strip("-")
+
+
+def unique_slug(text: str, used_slugs: dict[str, int], fallback: str) -> str:
+    base = slugify(text) or fallback
+    count = used_slugs.get(base, 0)
+    used_slugs[base] = count + 1
+    return base if count == 0 else f"{base}-{count + 1}"
 
 
 def parse_frontmatter(text: str) -> tuple[dict[str, str], str]:
@@ -112,8 +119,12 @@ def markdown_to_html(markdown: str) -> tuple[str, list[Heading]]:
     ordered_list_items: list[str] = []
     quote_lines: list[str] = []
     code_lines: list[str] = []
+    html_lines: list[str] = []
     code_lang = ""
+    html_block_tag = ""
     in_code_block = False
+    in_html_block = False
+    used_slugs: dict[str, int] = {}
 
     def flush_paragraph() -> None:
         nonlocal paragraph_buffer
@@ -158,6 +169,14 @@ def markdown_to_html(markdown: str) -> tuple[str, list[Heading]]:
         code_lines = []
         code_lang = ""
 
+    def flush_html() -> None:
+        nonlocal html_lines, html_block_tag
+        if not html_lines:
+            return
+        html_parts.append("\n".join(html_lines))
+        html_lines = []
+        html_block_tag = ""
+
     for line in lines:
         stripped = line.rstrip()
 
@@ -179,11 +198,31 @@ def markdown_to_html(markdown: str) -> tuple[str, list[Heading]]:
             continue
 
         clean = stripped.strip()
+        if in_html_block:
+            html_lines.append(stripped)
+            if clean == f"</{html_block_tag}>":
+                flush_html()
+                in_html_block = False
+            continue
+
         if not clean:
             flush_paragraph()
             flush_list()
             flush_ordered_list()
             flush_quote()
+            continue
+
+        if clean.startswith(("<div", "<section", "<figure")):
+            flush_paragraph()
+            flush_list()
+            flush_ordered_list()
+            flush_quote()
+            html_block_tag = clean[1:].split(None, 1)[0].rstrip(">")
+            html_lines.append(stripped)
+            if clean == f"</{html_block_tag}>":
+                flush_html()
+            else:
+                in_html_block = True
             continue
 
         if clean.startswith("> "):
@@ -215,7 +254,7 @@ def markdown_to_html(markdown: str) -> tuple[str, list[Heading]]:
             flush_ordered_list()
             flush_quote()
             text = clean[4:].strip()
-            slug = slugify(text)
+            slug = unique_slug(text, used_slugs, f"section-{len(headings) + 1}")
             headings.append(Heading(3, text, slug))
             html_parts.append(f'<h3 id="{slug}">{render_inline(text)}</h3>')
             continue
@@ -226,7 +265,7 @@ def markdown_to_html(markdown: str) -> tuple[str, list[Heading]]:
             flush_ordered_list()
             flush_quote()
             text = clean[3:].strip()
-            slug = slugify(text)
+            slug = unique_slug(text, used_slugs, f"section-{len(headings) + 1}")
             headings.append(Heading(2, text, slug))
             html_parts.append(f'<h2 id="{slug}">{render_inline(text)}</h2>')
             continue
@@ -237,7 +276,7 @@ def markdown_to_html(markdown: str) -> tuple[str, list[Heading]]:
             flush_ordered_list()
             flush_quote()
             text = clean[2:].strip()
-            slug = slugify(text)
+            slug = unique_slug(text, used_slugs, f"section-{len(headings) + 1}")
             headings.append(Heading(1, text, slug))
             html_parts.append(f'<h1 id="{slug}">{render_inline(text)}</h1>')
             continue
@@ -250,6 +289,8 @@ def markdown_to_html(markdown: str) -> tuple[str, list[Heading]]:
     flush_quote()
     if in_code_block:
         flush_code()
+    if in_html_block:
+        flush_html()
 
     return "\n          ".join(html_parts), headings
 
