@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime
 from html import escape
 from pathlib import Path
 import re
@@ -27,6 +28,7 @@ class Post:
     author: str
     description: str
     summary: str
+    tags: list[str]
     body_html: str
     headings: list[Heading]
     math: bool = False
@@ -86,7 +88,7 @@ GITHUB_SVG = '<svg class="icon" viewBox="0 0 16 16" width="16" height="16" fill=
 EMAIL_SVG = '<svg class="icon" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M1.75 2h12.5c.966 0 1.75.784 1.75 1.75v8.5A1.75 1.75 0 0 1 14.25 14H1.75A1.75 1.75 0 0 1 0 12.25v-8.5C0 2.784.784 2 1.75 2ZM1.5 12.251c0 .138.112.25.25.25h12.5a.25.25 0 0 0 .25-.25V5.809L8.38 9.397a.75.75 0 0 1-.76 0L1.5 5.809v6.442Zm13-8.181v-.32a.25.25 0 0 0-.25-.25H1.75a.25.25 0 0 0-.25.25v.32L8 7.88Z"/></svg>'
 
 
-def render_inline(text: str) -> str:
+def render_inline(text: str, enable_math: bool = False) -> str:
     # Extract math expressions before HTML escaping to preserve LaTeX syntax
     math_store: list[tuple[str, str]] = []  # (placeholder, latex)
 
@@ -99,7 +101,8 @@ def render_inline(text: str) -> str:
         math_store.append((placeholder, latex))
         return placeholder
 
-    text = re.sub(r"\$\$(.+?)\$\$|\$(.+?)\$", _save_math, text, flags=re.DOTALL)
+    if enable_math:
+        text = re.sub(r"\$\$(.+?)\$\$|\$(.+?)\$", _save_math, text, flags=re.DOTALL)
 
     escaped = escape(text)
     escaped = re.sub(
@@ -123,18 +126,17 @@ def render_inline(text: str) -> str:
     )
     escaped = re.sub(r"`([^`]+)`", lambda m: f"<code>{m.group(1)}</code>", escaped)
 
-    # Restore math expressions as KaTeX elements
     for placeholder, latex in math_store:
         if "display" in placeholder:
-            replacement = f'<span class="katex-display">{latex}</span>'
+            replacement = f'<span class="katex-display">{escape(latex)}</span>'
         else:
-            replacement = f'<span class="katex">{latex}</span>'
+            replacement = f'<span class="katex">{escape(latex)}</span>'
         escaped = escaped.replace(placeholder, replacement)
 
     return escaped
 
 
-def markdown_to_html(markdown: str) -> tuple[str, list[Heading]]:
+def markdown_to_html(markdown: str, enable_math: bool = False) -> tuple[str, list[Heading]]:
     lines = markdown.splitlines()
     html_parts: list[str] = []
     headings: list[Heading] = []
@@ -156,14 +158,14 @@ def markdown_to_html(markdown: str) -> tuple[str, list[Heading]]:
             return
         content = " ".join(line.strip() for line in paragraph_buffer).strip()
         if content:
-            html_parts.append(f"<p>{render_inline(content)}</p>")
+            html_parts.append(f"<p>{render_inline(content, enable_math)}</p>")
         paragraph_buffer = []
 
     def flush_list() -> None:
         nonlocal list_items
         if not list_items:
             return
-        items = "".join(f"<li>{render_inline(item)}</li>" for item in list_items)
+        items = "".join(f"<li>{render_inline(item, enable_math)}</li>" for item in list_items)
         html_parts.append(f"<ul>{items}</ul>")
         list_items = []
 
@@ -171,7 +173,7 @@ def markdown_to_html(markdown: str) -> tuple[str, list[Heading]]:
         nonlocal ordered_list_items
         if not ordered_list_items:
             return
-        items = "".join(f"<li>{render_inline(item)}</li>" for item in ordered_list_items)
+        items = "".join(f"<li>{render_inline(item, enable_math)}</li>" for item in ordered_list_items)
         html_parts.append(f"<ol>{items}</ol>")
         ordered_list_items = []
 
@@ -180,7 +182,7 @@ def markdown_to_html(markdown: str) -> tuple[str, list[Heading]]:
         if not quote_lines:
             return
         content = " ".join(line.strip() for line in quote_lines).strip()
-        html_parts.append(f"<blockquote><p>{render_inline(content)}</p></blockquote>")
+        html_parts.append(f"<blockquote><p>{render_inline(content, enable_math)}</p></blockquote>")
         quote_lines = []
 
     def flush_code() -> None:
@@ -280,7 +282,7 @@ def markdown_to_html(markdown: str) -> tuple[str, list[Heading]]:
             text = clean[7:].strip()
             slug = unique_slug(text, used_slugs, f"section-{len(headings) + 1}")
             headings.append(Heading(6, text, slug))
-            html_parts.append(f'<h6 id="{slug}">{render_inline(text)}</h6>')
+            html_parts.append(f'<h6 id="{slug}">{render_inline(text, enable_math)}</h6>')
             continue
 
         if clean.startswith("##### "):
@@ -291,7 +293,7 @@ def markdown_to_html(markdown: str) -> tuple[str, list[Heading]]:
             text = clean[6:].strip()
             slug = unique_slug(text, used_slugs, f"section-{len(headings) + 1}")
             headings.append(Heading(5, text, slug))
-            html_parts.append(f'<h5 id="{slug}">{render_inline(text)}</h5>')
+            html_parts.append(f'<h5 id="{slug}">{render_inline(text, enable_math)}</h5>')
             continue
 
         if clean.startswith("#### "):
@@ -302,7 +304,7 @@ def markdown_to_html(markdown: str) -> tuple[str, list[Heading]]:
             text = clean[5:].strip()
             slug = unique_slug(text, used_slugs, f"section-{len(headings) + 1}")
             headings.append(Heading(4, text, slug))
-            html_parts.append(f'<h4 id="{slug}">{render_inline(text)}</h4>')
+            html_parts.append(f'<h4 id="{slug}">{render_inline(text, enable_math)}</h4>')
             continue
 
         if clean.startswith("### "):
@@ -313,7 +315,7 @@ def markdown_to_html(markdown: str) -> tuple[str, list[Heading]]:
             text = clean[4:].strip()
             slug = unique_slug(text, used_slugs, f"section-{len(headings) + 1}")
             headings.append(Heading(3, text, slug))
-            html_parts.append(f'<h3 id="{slug}">{render_inline(text)}</h3>')
+            html_parts.append(f'<h3 id="{slug}">{render_inline(text, enable_math)}</h3>')
             continue
 
         if clean.startswith("## "):
@@ -324,7 +326,7 @@ def markdown_to_html(markdown: str) -> tuple[str, list[Heading]]:
             text = clean[3:].strip()
             slug = unique_slug(text, used_slugs, f"section-{len(headings) + 1}")
             headings.append(Heading(2, text, slug))
-            html_parts.append(f'<h2 id="{slug}">{render_inline(text)}</h2>')
+            html_parts.append(f'<h2 id="{slug}">{render_inline(text, enable_math)}</h2>')
             continue
 
         if clean.startswith("# "):
@@ -335,7 +337,7 @@ def markdown_to_html(markdown: str) -> tuple[str, list[Heading]]:
             text = clean[2:].strip()
             slug = unique_slug(text, used_slugs, f"section-{len(headings) + 1}")
             headings.append(Heading(1, text, slug))
-            html_parts.append(f'<h1 id="{slug}">{render_inline(text)}</h1>')
+            html_parts.append(f'<h1 id="{slug}">{render_inline(text, enable_math)}</h1>')
             continue
 
         paragraph_buffer.append(clean)
@@ -352,77 +354,13 @@ def markdown_to_html(markdown: str) -> tuple[str, list[Heading]]:
     return "\n          ".join(html_parts), headings
 
 
-_HEADING_RE = re.compile(r"<h([1-6])\s+id=\"([^\"]+)\">(.+?)</h\1>")
-
-
-def wrap_sections(body_html: str) -> str:
-    """Wrap content between headings in collapsible <details> elements."""
-    parts = _HEADING_RE.split(body_html)
-    # parts: [pre, level, id, text, content, level, id, text, content, ...]
-
-    if len(parts) < 4:
-        return body_html
-
-    def build_tree(items: list, min_level: int = 1) -> str:
-        html = ""
-        i = 0
-        while i < len(items):
-            if isinstance(items[i], tuple):
-                level, slug, text = items[i]
-                if level < min_level:
-                    break
-                # Collect content until next heading of same or higher level
-                content_parts = []
-                i += 1
-                while i < len(items) and not isinstance(items[i], tuple):
-                    content_parts.append(items[i])
-                    i += 1
-                # Collect child sections (deeper headings)
-                child_parts = []
-                while i < len(items) and isinstance(items[i], tuple) and items[i][0] > level:
-                    child_parts.append(items[i])
-                    i += 1
-                    while i < len(items) and not isinstance(items[i], tuple):
-                        child_parts.append(items[i])
-                        i += 1
-
-                inner = "".join(content_parts) + build_tree(child_parts, level + 1)
-                html += f'<details open data-section="{slug}" class="section-h{level}"><summary><h{level} id="{slug}">{text}</h{level}></summary><div class="section-inner"><div class="section-content">{inner}</div></div></details>'
-            else:
-                html += items[i]
-                i += 1
-        return html
-
-    # Parse parts into structured items
-    items = []
-    idx = 1  # skip pre-content (parts[0])
-    while idx < len(parts) - 2:
-        level = int(parts[idx])
-        slug = parts[idx + 1]
-        text = parts[idx + 2]
-        items.append((level, slug, text))
-        idx += 3
-        if idx < len(parts):
-            items.append(parts[idx])
-            idx += 1
-
-    # Add any trailing content
-    while idx < len(parts):
-        items.append(parts[idx])
-        idx += 1
-
-    # Also add pre-content
-    pre = parts[0]
-    result = build_tree(items)
-    return pre + result
-
-
 def load_posts() -> list[Post]:
     posts: list[Post] = []
     for path in sorted(POSTS_DIR.glob("*.md")):
         metadata, markdown = parse_frontmatter(path.read_text(encoding="utf-8"))
-        body_html, headings = markdown_to_html(markdown)
-        body_html = wrap_sections(body_html)
+        has_math = metadata.get("math", "").lower() == "true"
+        body_html, headings = markdown_to_html(markdown, has_math)
+        tags = [tag.strip() for tag in metadata.get("tags", "").split(",") if tag.strip()]
         posts.append(
             Post(
                 slug=path.stem,
@@ -431,12 +369,22 @@ def load_posts() -> list[Post]:
                 author=metadata.get("author", "Roselyn Chen"),
                 description=metadata.get("description", ""),
                 summary=metadata.get("summary", ""),
+                tags=tags,
                 body_html=body_html,
                 headings=headings,
-                math=metadata.get("math", "").lower() == "true",
+                math=has_math,
             )
         )
-    return posts
+    return sorted(posts, key=lambda post: parse_date(post.date), reverse=True)
+
+
+def parse_date(value: str) -> datetime:
+    for fmt in ("%B %d, %Y", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(value, fmt)
+        except ValueError:
+            pass
+    return datetime.min
 
 
 def load_page(name: str) -> Page:
@@ -513,9 +461,9 @@ def render_post(post: Post) -> str:
     katex_head = ""
     if post.math:
         katex_head = """
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"
-    onload="document.querySelectorAll('.katex-display,.katex').forEach(function(el){katex.render(el.textContent,el,{displayMode:el.classList.contains('katex-display')})})"></script>"""
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.17.0/dist/katex.min.css" integrity="sha384-vlBdW0r3AcZO/HboRPznQNowvexd3fY8qHOWkBi5q7KGgqJ+F48+DceybYmrVbmB" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.17.0/dist/katex.min.js" integrity="sha384-AtrdNsnxl/75rvBneBVH7DtOvCxSVahR2zWqle1coBKd8DEmLoviqNeJSx64gNAs" crossorigin="anonymous"
+    onload="document.querySelectorAll('.katex-display,.katex').forEach(function(el){katex.render(el.textContent,el,{displayMode:el.classList.contains('katex-display'),throwOnError:false,output:'htmlAndMathml'});})"></script>"""
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -569,59 +517,6 @@ def render_post(post: Post) -> str:
       </article>
     </main>
   </div>
-  <script>
-  (function() {{
-    var toc = document.querySelector('.tm-toc');
-    var body = document.querySelector('.tm-article-body');
-    if (!toc || !body) return;
-    var animating = new Set();
-    var DURATION = 250;
-
-    function animateToggle(el, open) {{
-      var inner = el.querySelector('.section-inner');
-      if (!inner) {{ el.open = open; return; }}
-      if (open) {{
-        el.open = true;
-        el.classList.remove('closing');
-        el.classList.add('opening');
-        inner.style.gridTemplateRows = '1fr';
-        var heading = el.querySelector('summary > *');
-        if (heading) heading.scrollIntoView({{ block: 'start', behavior: 'smooth' }});
-        setTimeout(function() {{ el.classList.remove('opening'); inner.style.gridTemplateRows = ''; }}, DURATION);
-      }} else {{
-        animating.add(el);
-        el.classList.add('closing');
-        requestAnimationFrame(function() {{
-          inner.style.gridTemplateRows = '0fr';
-          setTimeout(function() {{
-            el.open = false;
-            el.classList.remove('closing');
-            inner.style.gridTemplateRows = '';
-            animating.delete(el);
-          }}, DURATION);
-        }});
-      }}
-    }}
-
-    function sync(from, to, animate) {{
-      var id = from.getAttribute('data-section');
-      if (!id) return;
-      var target = to.querySelector('[data-section="' + id + '"]');
-      if (!target || target.open === from.open || animating.has(target)) return;
-      if (animate) animateToggle(target, from.open);
-      else target.open = from.open;
-    }}
-
-    body.addEventListener('toggle', function(e) {{
-      if (animating.has(e.target)) return;
-      sync(e.target, toc, false);
-    }}, true);
-
-    toc.addEventListener('toggle', function(e) {{
-      sync(e.target, body, true);
-    }}, true);
-  }})();
-  </script>
 </body>
 </html>
 """
@@ -630,10 +525,16 @@ def render_post(post: Post) -> str:
 def render_archive(posts: list[Post]) -> str:
     items = []
     for post in posts:
+        tags = "".join(f'<span class="post-tag">{escape(tag)}</span>' for tag in post.tags)
         items.append(
             f"""          <article class="tm-list-item">
             <h3><a href="./{post.slug}/">{escape(post.title)}</a></h3>
+            <div class="post-meta-line">
+              <span>{escape(post.date)}</span>
+              <span>{tags}</span>
+            </div>
             <p>{escape(post.summary or post.description)}</p>
+            <a class="read-more" href="./{post.slug}/">Read More</a>
           </article>"""
         )
 
@@ -678,13 +579,13 @@ def render_archive(posts: list[Post]) -> str:
       <div class="tm-content">
         <section id="archive-top" class="tm-hero">
           <p class="tm-kicker">Archive</p>
-          <h1>Writing archive for future technical posts and project notes.</h1>
+          <h1>Archive for technical notes, paper reading, and project logs.</h1>
           <div class="tm-meta">
             <span>Roselyn Chen</span>
             <span>May 2026</span>
           </div>
           <p class="tm-intro">
-            This page is generated from markdown source files. Future writing on robotics, reinforcement learning, simulation, testing workflows, and project retrospectives will appear here.
+            A chronological stream generated from markdown. Each post keeps a concise summary, lightweight tags, and a publication-style reading page.
           </p>
         </section>
 
@@ -700,9 +601,33 @@ def render_archive(posts: list[Post]) -> str:
 """
 
 
-def render_page(page: Page, nav_key: str) -> str:
+def render_recent_posts(posts: list[Post]) -> str:
+    if not posts:
+        return ""
+    items = []
+    for post in posts[:4]:
+        tags = "".join(f'<span class="post-tag">{escape(tag)}</span>' for tag in post.tags)
+        items.append(
+            f"""          <article class="tm-list-item compact-post">
+            <h3><a href="./archive/{post.slug}/">{escape(post.title)}</a></h3>
+            <div class="post-meta-line">
+              <span>{escape(post.date)}</span>
+              <span>{tags}</span>
+            </div>
+            <p>{escape(post.summary or post.description)}</p>
+          </article>"""
+        )
+    return f"""
+        <section class="tm-article-body tm-archive-list home-latest">
+          <h2>Latest writing</h2>
+{chr(10).join(items)}
+        </section>"""
+
+
+def render_page(page: Page, nav_key: str, posts: list[Post] | None = None) -> str:
     home_current = ' aria-current="page"' if nav_key == "home" else ""
     about_current = ' aria-current="page"' if nav_key == "about" else ""
+    latest_posts = render_recent_posts(posts or []) if nav_key == "home" else ""
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -755,6 +680,7 @@ def render_page(page: Page, nav_key: str) -> str:
         <section class="tm-article-body page-markdown-body">
           {page.body_html}
         </section>
+{latest_posts}
       </div>
     </main>
   </div>
@@ -775,7 +701,7 @@ def main() -> None:
 
     home_page = load_page("home")
     about_page = load_page("about")
-    ROOT.joinpath("index.html").write_text(render_page(home_page, "home"), encoding="utf-8")
+    ROOT.joinpath("index.html").write_text(render_page(home_page, "home", posts), encoding="utf-8")
     ROOT.joinpath("about", "index.html").write_text(render_page(about_page, "about"), encoding="utf-8")
 
 

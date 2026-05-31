@@ -333,49 +333,6 @@ code {
   color: var(--muted);
 }
 
-/* Content folding */
-.tm-article-body details {
-  margin: 0;
-}
-
-.tm-article-body details > summary {
-  display: block;
-  list-style: none;
-  cursor: pointer;
-}
-
-.tm-article-body details > summary::-webkit-details-marker,
-.tm-article-body details > summary::marker {
-  display: none;
-  content: "";
-}
-
-.tm-article-body details > summary > * {
-  display: inline;
-  margin: 0;
-}
-
-/* Folding animation */
-.tm-article-body details > .section-inner {
-  display: grid;
-  grid-template-rows: 1fr;
-  overflow: hidden;
-  transition: grid-template-rows 0.25s ease;
-}
-
-.tm-article-body details.closing > .section-inner {
-  grid-template-rows: 0fr;
-}
-
-.tm-article-body details.opening > .section-inner {
-  grid-template-rows: 1fr;
-}
-
-.tm-article-body details > .section-inner > .section-content {
-  min-height: 0;
-  overflow: hidden;
-}
-
 .tm-archive-list {
   padding-top: 0;
 }
@@ -393,6 +350,49 @@ code {
   font-size: 20px;
   line-height: 30px;
   margin-bottom: 8px;
+}
+
+.post-meta-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+  margin-bottom: 8px;
+  font-family: var(--sans);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.post-tag {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 1px 7px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  letter-spacing: 0;
+}
+
+.read-more {
+  display: inline-block;
+  margin-top: 10px;
+  font-family: var(--sans);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.read-more:hover {
+  color: var(--text);
+}
+
+.home-latest {
+  margin-top: -8px;
+}
+
+.compact-post {
+  padding: 16px 0;
 }
 
 .tm-article-body blockquote,
@@ -1064,13 +1064,16 @@ code {
 
 /* KaTeX math */
 .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 0;
   text-align: center;
   margin: 1.5em 0;
 }
 
 .katex {
   font-size: 1.1em;
-  white-space: normal;
+  white-space: nowrap;
 }
 
 .katex-display > .katex {

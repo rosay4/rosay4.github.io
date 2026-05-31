@@ -6,7 +6,7 @@
   <title>Roselyn Chen | Article</title>
   <meta
     name="description"
-    content="A publication-style article layout generated from markdown."
+    content="A short note that marks the beginning of this archive."
   >
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,13 +32,13 @@
 
     <main class="tm-main">
       <aside class="tm-toc" aria-label="On this page">
-        <a class="tm-toc-h2" href="#hello-world">Hello World</a>
+        <a class="tm-toc-h2" href="#start">Start</a>
       </aside>
 
       <article class="tm-content">
         <header class="tm-hero tm-hero-centered">
           <p class="tm-kicker">Archive</p>
-          <h1 class="tm-title-highlight">Hello World!!</h1>
+          <h1 class="tm-title-highlight">Hello World</h1>
           <div class="tm-publish-metadata">
             <span>Roselyn Chen</span>
             <span>May 17, 2026</span>
@@ -46,64 +46,11 @@
         </header>
 
         <section class="tm-article-body">
-          <details open data-section="hello-world" class="section-h2"><summary><h2 id="hello-world">Hello World</h2></summary><div class="section-inner"><div class="section-content">
-          <p>马上开始 robot learning 学习, 希望能记录一些有用的blog.</p></div></div></details>
+          <h2 id="start">Start</h2>
+          <p>This archive will collect paper reading notes, robotics experiments, implementation logs, and small ideas that are worth keeping.</p>
         </section>
       </article>
     </main>
   </div>
-  <script>
-  (function() {
-    var toc = document.querySelector('.tm-toc');
-    var body = document.querySelector('.tm-article-body');
-    if (!toc || !body) return;
-    var animating = new Set();
-    var DURATION = 250;
-
-    function animateToggle(el, open) {
-      var inner = el.querySelector('.section-inner');
-      if (!inner) { el.open = open; return; }
-      if (open) {
-        el.open = true;
-        el.classList.remove('closing');
-        el.classList.add('opening');
-        inner.style.gridTemplateRows = '1fr';
-        var heading = el.querySelector('summary > *');
-        if (heading) heading.scrollIntoView({ block: 'start', behavior: 'smooth' });
-        setTimeout(function() { el.classList.remove('opening'); inner.style.gridTemplateRows = ''; }, DURATION);
-      } else {
-        animating.add(el);
-        el.classList.add('closing');
-        requestAnimationFrame(function() {
-          inner.style.gridTemplateRows = '0fr';
-          setTimeout(function() {
-            el.open = false;
-            el.classList.remove('closing');
-            inner.style.gridTemplateRows = '';
-            animating.delete(el);
-          }, DURATION);
-        });
-      }
-    }
-
-    function sync(from, to, animate) {
-      var id = from.getAttribute('data-section');
-      if (!id) return;
-      var target = to.querySelector('[data-section="' + id + '"]');
-      if (!target || target.open === from.open || animating.has(target)) return;
-      if (animate) animateToggle(target, from.open);
-      else target.open = from.open;
-    }
-
-    body.addEventListener('toggle', function(e) {
-      if (animating.has(e.target)) return;
-      sync(e.target, toc, false);
-    }, true);
-
-    toc.addEventListener('toggle', function(e) {
-      sync(e.target, body, true);
-    }, true);
-  })();
-  </script>
 </body>
 </html>

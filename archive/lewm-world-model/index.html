@@ -46,13 +46,13 @@
           <p class="tm-kicker">Archive</p>
           <h1 class="tm-title-highlight">LEWM 世界模型分析解读</h1>
           <div class="tm-publish-metadata">
-            <span>GPT 5.5</span>
+            <span>Roselyn Chen</span>
             <span>May 29, 2026</span>
           </div>
         </header>
 
         <section class="tm-article-body">
-          <details open data-section="一句话看懂-lewm" class="section-h2"><summary><h2 id="一句话看懂-lewm">一句话看懂 LeWM</h2></summary><div class="section-inner"><div class="section-content">
+          <h2 id="一句话看懂-lewm">一句话看懂 LeWM</h2>
           <p>LeWM 想解决一个朴素但致命的问题：世界模型训练时，编码器可能把所有画面都映射成同一个向量，预测误差看起来很小，但表示已经失效。</p>
           <section class="lewm-stage lewm-stage-overview" aria-label="LeWM overview animation">
   <div class="lewm-copy">
@@ -73,7 +73,7 @@
     <div class="lewm-frame">z<sub>t+1</sub></div>
   </div>
 </section>
-          </div></div></details><details open data-section="表征崩溃" class="section-h2"><summary><h2 id="表征崩溃">表征崩溃</h2></summary><div class="section-inner"><div class="section-content">
+          <h2 id="表征崩溃">表征崩溃</h2>
           <p>如果只优化预测误差，模型会发现一条捷径：所有输入都编码成 0。预测值和目标值都变成 0，loss 很低，但特征没有任何辨别力。</p>
           <section class="lewm-stage lewm-collapse" aria-label="Representation collapse animation">
   <div class="lewm-copy">
@@ -89,7 +89,7 @@
     <div class="collapse-loss">loss ↓</div>
   </div>
 </section>
-          </div></div></details><details open data-section="sigreg-的直觉" class="section-h2"><summary><h2 id="sigreg-的直觉">SIGReg 的直觉</h2></summary><div class="section-inner"><div class="section-content">
+          <h2 id="sigreg-的直觉">SIGReg 的直觉</h2>
           <p>SIGReg 不让特征挤成一个点。它随机抽很多方向，把高维特征投影成一维，再检查每条投影是否像正态分布。</p>
           <section class="lewm-stage lewm-sigreg" aria-label="SIGReg projection animation">
   <div class="lewm-copy">
@@ -109,7 +109,7 @@
     <div class="projection projection-c"></div>
   </div>
 </section>
-          </div></div></details><details open data-section="训练目标" class="section-h2"><summary><h2 id="训练目标">训练目标</h2></summary><div class="section-inner"><div class="section-content">
+          <h2 id="训练目标">训练目标</h2>
           <p>LeWM 的训练目标很干净：预测未来，同时约束当前 batch 的表示分布。</p>
           <pre><code class="language-python">loss = pred_loss + lambda_ * sigreg_loss</code></pre>
           <section class="lewm-stage lewm-loss" aria-label="LeWM loss animation">
@@ -128,7 +128,7 @@
     <p>稳定端到端训练</p>
   </div>
 </section>
-          </div></div></details><details open data-section="用世界模型规划" class="section-h2"><summary><h2 id="用世界模型规划">用世界模型规划</h2></summary><div class="section-inner"><div class="section-content">
+          <h2 id="用世界模型规划">用世界模型规划</h2>
           <p>训练完成后，LeWM 在潜在空间里“想象”未来：采样动作序列，滚动预测 H 步，选择最接近目标的那条轨迹。</p>
           <section class="lewm-stage lewm-planning" aria-label="Planning in latent space animation">
   <div class="lewm-copy">
@@ -144,66 +144,13 @@
     <div class="planner-dot"></div>
   </div>
 </section>
-          </div></div></details><details open data-section="为什么值得看" class="section-h2"><summary><h2 id="为什么值得看">为什么值得看</h2></summary><div class="section-inner"><div class="section-content">
+          <h2 id="为什么值得看">为什么值得看</h2>
           <ul><li>理论动机更清楚：用分布约束切断崩溃捷径。</li><li>结构更简单：Encoder + Predictor，没有老师学生双网络。</li><li>超参数更少：主要关注投影数量 <code>M</code> 和权重 <code>lambda</code>。</li><li>更适合从零训练：不用把上限交给冻结的预训练视觉模型。</li></ul>
-          </div></div></details><details open data-section="复现提示" class="section-h2"><summary><h2 id="复现提示">复现提示</h2></summary><div class="section-inner"><div class="section-content">
-          <p>先从简单环境开始，例如 <code>tworoom</code>。如果任务很简单，过高的潜在维度可能反而不自然；如果环境更复杂，可以优先观察 SIGReg 权重、投影数和训练曲线稳定性。</p></div></div></details>
+          <h2 id="复现提示">复现提示</h2>
+          <p>先从简单环境开始，例如 <code>tworoom</code>。如果任务很简单，过高的潜在维度可能反而不自然；如果环境更复杂，可以优先观察 SIGReg 权重、投影数和训练曲线稳定性。</p>
         </section>
       </article>
     </main>
   </div>
-  <script>
-  (function() {
-    var toc = document.querySelector('.tm-toc');
-    var body = document.querySelector('.tm-article-body');
-    if (!toc || !body) return;
-    var animating = new Set();
-    var DURATION = 250;
-
-    function animateToggle(el, open) {
-      var inner = el.querySelector('.section-inner');
-      if (!inner) { el.open = open; return; }
-      if (open) {
-        el.open = true;
-        el.classList.remove('closing');
-        el.classList.add('opening');
-        inner.style.gridTemplateRows = '1fr';
-        var heading = el.querySelector('summary > *');
-        if (heading) heading.scrollIntoView({ block: 'start', behavior: 'smooth' });
-        setTimeout(function() { el.classList.remove('opening'); inner.style.gridTemplateRows = ''; }, DURATION);
-      } else {
-        animating.add(el);
-        el.classList.add('closing');
-        requestAnimationFrame(function() {
-          inner.style.gridTemplateRows = '0fr';
-          setTimeout(function() {
-            el.open = false;
-            el.classList.remove('closing');
-            inner.style.gridTemplateRows = '';
-            animating.delete(el);
-          }, DURATION);
-        });
-      }
-    }
-
-    function sync(from, to, animate) {
-      var id = from.getAttribute('data-section');
-      if (!id) return;
-      var target = to.querySelector('[data-section="' + id + '"]');
-      if (!target || target.open === from.open || animating.has(target)) return;
-      if (animate) animateToggle(target, from.open);
-      else target.open = from.open;
-    }
-
-    body.addEventListener('toggle', function(e) {
-      if (animating.has(e.target)) return;
-      sync(e.target, toc, false);
-    }, true);
-
-    toc.addEventListener('toggle', function(e) {
-      sync(e.target, body, true);
-    }, true);
-  })();
-  </script>
 </body>
 </html>
