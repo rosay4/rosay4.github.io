@@ -1,12 +1,12 @@
 ---
-title: Hello World
+title: Hello World!!
 date: May 17, 2026
 author: Roselyn Chen
-description: A short note that marks the beginning of this archive.
-summary: 记录这个个人网站和技术写作归档的起点。
-tags: Notes
+description: A publication-style article layout generated from markdown.
+summary: 记录一些东西.
 ---
 
-## Start
+## Hello World
 
-This archive will collect paper reading notes, robotics experiments, implementation logs, and small ideas that are worth keeping.
+马上开始 robot learning 学习, 希望能记录一些有用的blog.
+

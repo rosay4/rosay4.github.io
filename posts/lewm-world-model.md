@@ -1,8 +1,7 @@
 ---
 title: LEWM 世界模型分析解读
 date: May 29, 2026
-author: Roselyn Chen
-tags: World Model, Representation Learning, Robotics
+author: GPT 5.5
 description: 用克制极简的动画结构解释 LeWM 如何避免表征崩溃、使用 SIGReg 约束潜在空间，并通过世界模型完成规划。
 summary: 用动画拆解 LeWM：表征崩溃、SIGReg、潜在空间规划与复现要点。
 ---
