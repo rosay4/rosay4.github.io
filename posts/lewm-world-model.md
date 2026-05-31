@@ -2,6 +2,7 @@
 title: LEWM 世界模型分析解读
 date: May 29, 2026
 author: GPT 5.5
+math: true
 description: 用克制极简的动画结构解释 LeWM 如何避免表征崩溃、使用 SIGReg 约束潜在空间，并通过世界模型完成规划。
 summary: 用动画拆解 LeWM：表征崩溃、SIGReg、潜在空间规划与复现要点。
 ---
@@ -76,9 +77,11 @@ SIGReg 不让特征挤成一个点。它随机抽很多方向，把高维特征�
 
 LeWM 的训练目标很干净：预测未来，同时约束当前 batch 的表示分布。
 
-```python
-loss = pred_loss + lambda_ * sigreg_loss
-```
+$$
+\mathcal{L}_{\mathrm{LeWM}}
+= \mathcal{L}_{\mathrm{pred}}
++ \lambda \,\mathcal{L}_{\mathrm{SIGReg}}
+$$
 
 <section class="lewm-stage lewm-loss" aria-label="LeWM loss animation">
   <div class="loss-term">
@@ -109,10 +112,15 @@ loss = pred_loss + lambda_ * sigreg_loss
   <div class="planning-space" aria-hidden="true">
     <div class="state state-start">z<sub>1</sub></div>
     <div class="state state-goal">z<sub>g</sub></div>
-    <div class="path path-bad"></div>
-    <div class="path path-mid"></div>
-    <div class="path path-best"></div>
-    <div class="planner-dot"></div>
+    <div class="planning-horizon">
+      <span>H=1</span><span>H=2</span><span>H=3</span><span>H=4</span>
+    </div>
+    <div class="path path-bad"><span></span><span></span><span></span></div>
+    <div class="path path-mid"><span></span><span></span><span></span></div>
+    <div class="path path-best"><span></span><span></span><span></span></div>
+    <div class="planned-step"><span>execute a<sub>1</sub></span></div>
+    <div class="planner-dot rollout-dot"></div>
+    <div class="planner-dot execute-dot"></div>
   </div>
 </section>
 
